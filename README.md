@@ -1,79 +1,198 @@
 # AI-Powered Intelligent Resume Screening System
 
-A production-grade, full-stack Applicant Tracking System (ATS) that uses NLP and Machine Learning to parse, match, and rank resumes against job descriptions.
+A production-ready, full-stack Applicant Tracking System (ATS) designed to automate hiring workflows using Artificial Intelligence, Natural Language Processing, and Machine Learning. This platform intelligently parses resumes, compares them with job descriptions, ranks candidates, and provides hiring insights through a modern SaaS dashboard.
 
-## 🚀 Features
+---
 
-- **Premium SaaS UI**: Modern, dark-themed dashboard with glassmorphism and smooth animations.
-- **AI Resume Parsing**: Extracts structured data (Name, Email, Phone, Skills, Education, Experience) from PDF and DOCX files.
-- **BERT Semantic Matching**: Uses BERT embeddings for precise, non-keyword-based candidate ranking.
-- **Fairness Audit**: Automated bias detection (gender, university, name-based) to ensure equitable hiring.
-- **Real-time Analytics**: Visual insights into skill distributions and pipeline performance.
-- **Production Infrastructure**: Optimized Docker builds with CPU-only PyTorch support.
+#  Tech Stack
 
-## 🛠️ Tech Stack
+## Frontend
+- React.js  
+- Vite  
+- JavaScript  
+- Tailwind CSS  
+- Framer Motion  
+- Recharts  
+- Lucide React  
 
-- **Backend**: FastAPI, PyMuPDF, python-docx, spaCy, sentence-transformers, scikit-learn, loguru.
-- **Frontend**: React (JavaScript), Vite, Tailwind CSS, Lucide React, Recharts, Framer Motion.
-- **Database**: Supabase (PostgreSQL).
-- **Deployment**: Docker, Docker Compose, Nginx.
+## Backend
+- FastAPI  
+- Python  
+- PyMuPDF  
+- python-docx  
+- spaCy  
+- sentence-transformers  
+- scikit-learn  
+- loguru  
 
-## 📦 Quick Start
+## Database
+- Supabase (PostgreSQL)
 
-### 1. Prerequisites
+## AI / ML
+- Resume Parsing using NLP  
+- BERT Semantic Similarity Matching  
+- Candidate Ranking Engine  
+- Fairness / Bias Detection Models  
 
-- Docker & Docker Compose
-- A Supabase account and project
+## Deployment & DevOps
+- Docker  
+- Docker Compose  
+- Nginx  
 
-### 2. Database Setup
+---
 
-1. Create a project in [Supabase](https://supabase.com/).
-2. Run `supabase_schema.sql` in the Supabase SQL Editor.
-3. Obtain your `SUPABASE_URL` and `SUPABASE_KEY` (anon key).
+###  Sample Frontend Link made by EmergentAI:
+https://resume-screener-pro.preview.emergentagent.com/
 
-### 3. Configuration
+---
 
-Create a `.env` file in the root directory:
+#  Project Overview
 
-```bash
-SUPABASE_URL=your_project_url
-SUPABASE_KEY=your_anon_key
-VITE_API_URL=http://localhost:8000/api/v1
-```
+The AI-Powered Intelligent Resume Screening System helps recruiters and organizations streamline their hiring process by automatically screening, evaluating, and ranking resumes against job descriptions.
 
-### 4. Launch
+Instead of manually reviewing hundreds of applications, recruiters can upload resumes and instantly receive:
 
-```bash
-docker-compose up --build
-```
+- Structured candidate profiles  
+- AI-based compatibility scores  
+- Skill gap analysis  
+- Ranked candidate lists  
+- Bias detection reports  
+- Hiring analytics dashboard  
 
-- **Frontend**: `http://localhost:3000`
-- **Backend API**: `http://localhost:8000`
-- **Interactive API Docs**: `http://localhost:8000/docs`
+---
 
-## 🏗️ Folder Structure
+#  Core Features
 
-```
-.
-├── backend/                # FastAPI Application
-│   ├── app/
-│   │   ├── routes/         # API Endpoints
-│   │   ├── services/       # Parsing & Logic
-│   │   └── utils/          # Config & Supabase
-├── frontend/               # React + Tailwind
-│   ├── src/
-│   │   ├── components/     # UI Library
-│   │   └── pages/          # Premium Pages
-├── docker-compose.yml      # Optimized Orchestration
-└── supabase_schema.sql     # Database Schema
-```
+##  AI Resume Parsing
 
-### 📝 Important Notes
+Automatically extracts important candidate information from uploaded PDF and DOCX resumes:
 
-- **PyTorch (CPU-Only)**: Optimized for container stability and size.
-- **DNS Resolution**: Backend includes retry logic for Supabase connectivity.
-- **File Validation**: Supports PDF and DOCX up to 10MB.
+- Full Name  
+- Email Address  
+- Phone Number  
+- Skills  
+- Work Experience  
+- Education  
+- Certifications  
+- Projects  
 
-## 📄 License
+---
 
-MIT
+##  Smart Candidate Matching
+
+Uses BERT embeddings and semantic similarity models to understand meaning beyond keywords.
+
+This enables:
+
+- Better JD-to-resume matching  
+- Contextual skill understanding  
+- Relevant candidate recommendations  
+- Accurate ranking system  
+
+---
+
+##  Candidate Ranking Engine
+
+Every uploaded resume is scored against the job description based on:
+
+- Skill Match Percentage  
+- Experience Relevance  
+- Education Fit  
+- Semantic Similarity Score  
+- Overall ATS Score  
+
+Candidates are automatically sorted from best to least fit.
+
+---
+
+##  Fairness Audit System
+
+Built-in bias detection module checks for unfair patterns such as:
+
+- Gender-based bias  
+- University preference bias  
+- Name-origin bias  
+- Shortlisting imbalance  
+
+Helps organizations ensure ethical and inclusive hiring.
+
+---
+
+##  Real-Time Analytics Dashboard
+
+Interactive dashboards provide hiring intelligence such as:
+
+- Top Skills Across Applicants  
+- Resume Funnel Metrics  
+- Match Score Distribution  
+- Candidate Pipeline Status  
+- Screening Efficiency Reports  
+
+---
+
+##  Premium SaaS UI
+
+Modern enterprise-grade interface featuring:
+
+- Dark Theme Dashboard  
+- Glassmorphism Cards  
+- Smooth Animations  
+- Responsive Layout  
+- Elegant Data Visualizations  
+- Clean Recruiter Workflow  
+
+---
+
+#  Supported File Uploads
+
+- PDF Resume Files  
+- DOCX Resume Files  
+
+### Validation Rules
+
+- Max File Size: 10MB  
+- Secure File Type Validation  
+- Optimized Parsing Performance  
+
+---
+
+#  AI Workflow
+
+## Step 1: Upload Resume
+
+Recruiters upload candidate resumes.
+
+## Step 2: Parse Resume
+
+System extracts structured data using NLP.
+
+## Step 3: Add Job Description
+
+Paste or upload job description.
+
+## Step 4: Semantic Matching
+
+BERT compares candidate profile with JD.
+
+## Step 5: Candidate Ranking
+
+Applicants receive ATS score and ranking.
+
+## Step 6: Review Insights
+
+Recruiters view analytics and fairness reports.
+
+---
+
+#  Project Architecture
+
+```text
+Frontend (React + Tailwind)
+        ↓
+REST API (FastAPI Backend)
+        ↓
+AI Processing Engine
+        ↓
+Supabase PostgreSQL Database
+        ↓
+Analytics + Dashboard
