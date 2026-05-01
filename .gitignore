@@ -26,5 +26,6 @@ env/
 .DS_Store
 Thumbs.db
 
-# Docker
-.dockerignore
+# ML models
+backend/app/ml_models/*.pkl
+backend/app/ml_models/*.npy

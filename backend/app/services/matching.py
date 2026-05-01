@@ -1,68 +1,82 @@
-from typing import List, Dict, Any
-from app.models.schemas import ScoringResult, JobDescription, ParsedData
-from app.pipelines.nlp_pipeline import nlp_pipeline
 from app.utils.config import settings
+import os
+import joblib
+import numpy as np
 
 class CandidateScorer:
-    @staticmethod
-    def calculate_skill_match(candidate_skills: List[str], required_skills: List[str]) -> float:
+    """Scores candidates based on skill match, experience, and semantic similarity."""
+
+    def __init__(self):
+        self.skill_weight = settings.SKILL_WEIGHT
+        self.exp_weight = settings.EXPERIENCE_WEIGHT
+        self.semantic_weight = settings.SEMANTIC_WEIGHT
+
+        # Try to load ranking model if available
+        self.ranking_model = None
+        if os.path.exists(settings.RANKING_MODEL_PATH):
+            try:
+                self.ranking_model = joblib.load(settings.RANKING_MODEL_PATH)
+            except Exception:
+                pass
+
+    def calculate_skill_match(self, candidate_skills, required_skills):
+        """Calculate skill match percentage."""
         if not required_skills:
-            return 1.0
-        
-        matches = [skill for skill in required_skills if skill.lower() in [s.lower() for s in candidate_skills]]
-        return len(matches) / len(required_skills)
+            return 0.0
 
-    @staticmethod
-    def calculate_experience_score(candidate_years: float, required_years: float) -> float:
-        if required_years == 0:
-            return 1.0
-        
-        # Penalize slightly if below required, reward if above (up to a point)
-        score = candidate_years / required_years
-        return min(1.2, score)  # Max score 1.2 if significantly over-experienced
+        candidate_set = {s.lower().strip() for s in candidate_skills}
+        required_set = {s.lower().strip() for s in required_skills}
 
-    @staticmethod
-    def calculate_overall_score(
-        skill_score: float, 
-        experience_score: float, 
-        semantic_score: float
-    ) -> float:
-        return (
-            skill_score * settings.SKILL_WEIGHT +
-            experience_score * settings.EXPERIENCE_WEIGHT +
-            semantic_score * settings.SEMANTIC_WEIGHT
+        matches = candidate_set & required_set
+        return (len(matches) / len(required_set)) * 100
+
+    def calculate_experience_score(self, candidate_exp, min_exp):
+        """Calculate experience match score."""
+        if min_exp == 0:
+            return 100.0
+        if candidate_exp >= min_exp:
+            # Bonus for having more experience, capped at 100
+            return min(100.0, 70 + (candidate_exp - min_exp) * 5)
+        else:
+            # Penalty for less experience
+            return max(0.0, (candidate_exp / min_exp) * 70)
+
+    def calculate_semantic_score(self, candidate_text, required_skills):
+        """Simple keyword-based semantic score."""
+        if not candidate_text:
+            return 50.0
+
+        text_lower = candidate_text.lower()
+        matches = sum(1 for skill in required_skills if skill.lower() in text_lower)
+        base = (matches / len(required_skills)) * 80 if required_skills else 50
+        return min(100.0, base + 20)
+
+    def score_candidate(self, candidate_skills, candidate_experience, candidate_text, required_skills, min_experience):
+        """Score a candidate and return detailed results."""
+        skill_score = self.calculate_skill_match(candidate_skills, required_skills)
+        exp_score = self.calculate_experience_score(candidate_experience, min_experience)
+        semantic_score = self.calculate_semantic_score(candidate_text, required_skills)
+
+        # Weighted overall score
+        overall = (
+            skill_score * self.skill_weight +
+            exp_score * self.exp_weight +
+            semantic_score * self.semantic_weight
         )
 
-    @classmethod
-    def score_candidate(
-        cls, 
-        candidate_id: str, 
-        candidate_name: str,
-        candidate_data: ParsedData, 
-        job: JobDescription,
-        resume_text: str
-    ) -> ScoringResult:
-        skill_score = cls.calculate_skill_match(candidate_data.skills, job.required_skills)
-        experience_score = cls.calculate_experience_score(candidate_data.total_experience_years, job.min_experience_years)
-        
-        # Compute semantic similarity using embeddings
-        semantic_score = nlp_pipeline.compute_similarity(resume_text, job.description)
-        
-        overall_score = cls.calculate_overall_score(skill_score, experience_score, semantic_score)
-        
-        # Generate explanation
-        explanation = f"Matches {skill_score*100:.0f}% of required skills. "
-        explanation += f"Has {candidate_data.total_experience_years} years of experience vs {job.min_experience_years} required. "
-        explanation += f"Semantic similarity: {semantic_score*100:.1f}%."
+        # If ranking model is available, use it for final prediction
+        if self.ranking_model is not None:
+            try:
+                features = np.array([[skill_score, exp_score, semantic_score]])
+                prediction = self.ranking_model.predict(features)[0]
+                # Scale prediction to 0-100
+                overall = min(100, max(0, prediction * 100))
+            except Exception:
+                pass
 
-        return ScoringResult(
-            candidate_id=candidate_id,
-            candidate_name=candidate_name,
-            overall_score=round(overall_score * 100, 2),
-            skill_match_score=round(skill_score * 100, 2),
-            experience_score=round(experience_score * 100, 2),
-            semantic_similarity_score=round(semantic_score * 100, 2),
-            explanation=explanation
-        )
-
-candidate_scorer = CandidateScorer()
+        return {
+            "overall": round(overall, 1),
+            "skill": round(skill_score, 1),
+            "experience": round(exp_score, 1),
+            "semantic": round(semantic_score, 1),
+        }

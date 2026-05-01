@@ -1,79 +1,146 @@
-# AI-Powered Intelligent Resume Screening System
+# AI.Screen — Hiring Intelligence
 
-A production-grade, full-stack Applicant Tracking System (ATS) that uses NLP and Machine Learning to parse, match, and rank resumes against job descriptions.
+AI-powered resume screening, candidate ranking, and bias detection for modern hiring teams.
 
-## 🚀 Features
+## Features
 
-- **Premium SaaS UI**: Modern, dark-themed dashboard with glassmorphism and smooth animations.
-- **AI Resume Parsing**: Extracts structured data (Name, Email, Phone, Skills, Education, Experience) from PDF and DOCX files.
-- **BERT Semantic Matching**: Uses BERT embeddings for precise, non-keyword-based candidate ranking.
-- **Fairness Audit**: Automated bias detection (gender, university, name-based) to ensure equitable hiring.
-- **Real-time Analytics**: Visual insights into skill distributions and pipeline performance.
-- **Production Infrastructure**: Optimized Docker builds with CPU-only PyTorch support.
+- **Resume Parsing** — Upload PDF, DOCX, or TXT resumes and automatically extract skills, experience, education, and contact info
+- **Candidate Ranking** — Define a job role and get an instant ranked shortlist with skill overlap, experience fit, and semantic similarity scores
+- **Bias Detection** — Identify gendered language and elite-university preferences in job descriptions
+- **Hiring Analytics** — Track your pipeline with skill distribution charts, quality trends, and hiring funnel visualizations
 
-## 🛠️ Tech Stack
+## Quick Start
 
-- **Backend**: FastAPI, PyMuPDF, python-docx, spaCy, sentence-transformers, scikit-learn, loguru.
-- **Frontend**: React (JavaScript), Vite, Tailwind CSS, Lucide React, Recharts, Framer Motion.
-- **Database**: Supabase (PostgreSQL).
-- **Deployment**: Docker, Docker Compose, Nginx.
+### Without Docker
 
-## 📦 Quick Start
-
-### 1. Prerequisites
-
-- Docker & Docker Compose
-- A Supabase account and project
-
-### 2. Database Setup
-
-1. Create a project in [Supabase](https://supabase.com/).
-2. Run `supabase_schema.sql` in the Supabase SQL Editor.
-3. Obtain your `SUPABASE_URL` and `SUPABASE_KEY` (anon key).
-
-### 3. Configuration
-
-Create a `.env` file in the root directory:
+#### 1. Backend
 
 ```bash
-SUPABASE_URL=your_project_url
-SUPABASE_KEY=your_anon_key
-VITE_API_URL=http://localhost:8000/api/v1
+cd backend
+python -m venv venv
+venv\Scripts\activate    # Windows
+# source venv/bin/activate  # Mac/Linux
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+uvicorn app.main:app --reload
 ```
 
-### 4. Launch
+Backend runs at `http://localhost:8000`
+Swagger docs at `http://localhost:8000/docs`
+
+#### 2. Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Frontend runs at `http://localhost:3000`
+
+#### 3. Jupyter Notebooks
+
+```bash
+pip install notebook jupyter
+jupyter notebook
+```
+
+Open `notebooks/` and run cells in order (01 through 06).
+
+### With Docker
 
 ```bash
 docker-compose up --build
 ```
 
-- **Frontend**: `http://localhost:3000`
-- **Backend API**: `http://localhost:8000`
-- **Interactive API Docs**: `http://localhost:8000/docs`
+- Frontend: `http://localhost:3000`
+- Backend Swagger: `http://localhost:8000/docs`
 
-## 🏗️ Folder Structure
+## Project Structure
 
 ```
-.
-├── backend/                # FastAPI Application
+AI_RESUME_SCREENER/
+├── backend/
 │   ├── app/
-│   │   ├── routes/         # API Endpoints
-│   │   ├── services/       # Parsing & Logic
-│   │   └── utils/          # Config & Supabase
-├── frontend/               # React + Tailwind
+│   │   ├── main.py              # FastAPI app
+│   │   ├── models/schemas.py    # Pydantic models
+│   │   ├── routes/              # API routes
+│   │   ├── services/            # Business logic
+│   │   ├── pipelines/           # NLP pipeline
+│   │   └── utils/               # Config, helpers
+│   ├── ml_models/               # Trained .pkl models
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/
 │   ├── src/
-│   │   ├── components/     # UI Library
-│   │   └── pages/          # Premium Pages
-├── docker-compose.yml      # Optimized Orchestration
-└── supabase_schema.sql     # Database Schema
+│   │   ├── pages/               # Page components
+│   │   ├── components/          # Shared components
+│   │   └── services/api.js      # API client
+│   ├── Dockerfile
+│   └── package.json
+├── datasets/
+│   ├── candidates.csv           # 500 synthetic candidates
+│   ├── jobs.csv                 # 50 job descriptions
+│   └── bias_samples.csv         # 500 labeled bias samples
+├── notebooks/
+│   ├── 01_data_cleaning.ipynb
+│   ├── 02_skill_extraction.ipynb
+│   ├── 03_embeddings.ipynb
+│   ├── 04_ranking_model.ipynb
+│   ├── 05_bias_detection.ipynb
+│   └── 06_pipeline_demo.ipynb
+├── scripts/
+│   └── generate_datasets.py     # Regenerate datasets
+├── docker-compose.yml
+└── README.md
 ```
 
-### 📝 Important Notes
+## Datasets
 
-- **PyTorch (CPU-Only)**: Optimized for container stability and size.
-- **DNS Resolution**: Backend includes retry logic for Supabase connectivity.
-- **File Validation**: Supports PDF and DOCX up to 10MB.
+All datasets are auto-generated using Faker with a fixed seed for reproducibility:
 
-## 📄 License
+| File | Rows | Description |
+|------|------|-------------|
+| `candidates.csv` | 500 | Synthetic candidate profiles with skills, experience, education |
+| `jobs.csv` | 50 | Job descriptions with required skills and experience levels |
+| `bias_samples.csv` | 500 | Text samples labeled for gender and university bias |
+
+Regenerate with: `python scripts/generate_datasets.py`
+
+## ML Pipeline
+
+The notebooks walk through the full ML pipeline:
+
+1. **Data Cleaning** — Text preprocessing, stopword removal, lemmatization
+2. **Skill Extraction** — Regex and spaCy PhraseMatcher skill identification
+3. **Embeddings** — BERT-based semantic embeddings via SentenceTransformer
+4. **Ranking Model** — XGBoost classifier for hire/reject predictions
+5. **Bias Detection** — Heuristic-based gendered language and university bias detection
+6. **Pipeline Demo** — End-to-end candidate screening demonstration
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 19, Vite 6, Tailwind CSS 4, Framer Motion, Recharts, Lucide Icons |
+| Backend | FastAPI, Pydantic, Uvicorn |
+| ML/NLP | spaCy, SentenceTransformers, Scikit-learn, XGBoost |
+| Data | Pandas, Faker |
+| Infra | Docker, Docker Compose, Nginx |
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Health check with model status |
+| POST | `/api/v1/resumes/upload` | Upload and parse a resume |
+| GET | `/api/v1/resumes` | List all candidates |
+| GET | `/api/v1/resumes/{id}` | Get a specific candidate |
+| POST | `/api/v1/jobs/match` | Match candidates against a job |
+| GET | `/api/v1/jobs` | List all job descriptions |
+| GET | `/api/v1/analytics/summary` | Get analytics summary |
+| GET | `/api/v1/analytics/bias/{id}` | Get bias report for a candidate |
+
+## License
 
 MIT

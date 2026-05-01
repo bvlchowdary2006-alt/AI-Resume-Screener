@@ -1,251 +1,329 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useDropzone } from "react-dropzone";
 import {
-  Upload,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
+  UploadCloud,
   FileText,
+  User,
+  Mail,
+  Briefcase,
+  Clock,
+  Tag,
+  AlignLeft,
   X,
+  Check,
+  Loader2,
 } from "lucide-react";
-import { resumeService } from "../services/api";
-import Button from "../components/ui/Button";
-import Card from "../components/ui/Card";
-import Badge from "../components/ui/Badge";
 
-const UploadResume = () => {
+export default function UploadResume() {
   const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(null);
-  const [error, setError] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploaded, setUploaded] = useState(false);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    role: "",
+    experience: "0",
+    skills: "",
+    summary: "",
+  });
+  const [errors, setErrors] = useState({});
 
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-      setError(null);
-      setResult(null);
+  const onDrop = useCallback((acceptedFiles) => {
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+      setErrors({});
+    }
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: {
+      "application/pdf": [".pdf"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+      "application/msword": [".doc"],
+      "text/plain": [".txt"],
+    },
+    maxSize: 10 * 1024 * 1024,
+    multiple: false,
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: "" });
     }
   };
 
-  const onDragOver = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
-  const onDragLeave = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(false);
-  }, []);
-
-  const onDrop = useCallback((e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
-      setError(null);
-      setResult(null);
-    }
-  }, []);
-
   const handleUpload = async () => {
-    if (!file) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await resumeService.upload(file);
-      setResult(data);
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || "Failed to upload and parse resume",
-      );
-    } finally {
-      setLoading(false);
+    if (!formData.fullName.trim()) {
+      setErrors({ fullName: "Name is required" });
+      return;
     }
+    if (!formData.email.trim()) {
+      setErrors({ email: "Email is required" });
+      return;
+    }
+
+    setUploading(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setUploading(false);
+    setUploaded(true);
+  };
+
+  const handleReset = () => {
+    setFile(null);
+    setUploaded(false);
+    setFormData({ fullName: "", email: "", role: "", experience: "0", skills: "", summary: "" });
+    setErrors({});
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="text-center space-y-4">
-        <h2 className="text-4xl font-bold">Resume Ingestion</h2>
-        <p className="text-surface-400 max-w-2xl mx-auto">
-          Upload candidate resumes in PDF or DOCX format. Our AI will
-          automatically extract and structure the data.
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+      {/* Header */}
+      <div className="mb-8">
+        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+          Intake
+        </p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+          Upload a resume
+        </h1>
+        <p className="text-sm text-gray-500 mt-2">
+          Drop a file and fill in the basics. We&rsquo;ll structure it for scoring and ranking.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Upload Card */}
-        <div className="lg:col-span-5">
-          <Card className="p-8 space-y-6">
-            <div
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-              className={`relative border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 ${
-                isDragging
-                  ? "border-brand-500 bg-brand-500/5"
-                  : "border-surface-700 hover:border-surface-600 bg-surface-950/30"
-              }`}
-            >
-              <input
-                type="file"
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                accept=".pdf,.docx"
-                onChange={handleFileChange}
-              />
-              <div className="space-y-4">
-                <div className="w-16 h-16 bg-surface-800 rounded-full flex items-center justify-center mx-auto text-surface-400 group-hover:text-brand-400 transition-colors">
-                  <Upload size={32} />
-                </div>
-                <div>
-                  <p className="text-lg font-bold">
-                    {file ? file.name : "Drop resume here"}
-                  </p>
-                  <p className="text-sm text-surface-500 mt-1">
-                    Supports PDF and DOCX (Max 10MB)
-                  </p>
-                </div>
-              </div>
-            </div>
+      <div className="grid lg:grid-cols-5 gap-6">
+        {/* Left - Upload Zone */}
+        <div className="lg:col-span-2">
+          <div
+            {...getRootProps()}
+            className={`relative rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-all ${
+              isDragActive
+                ? "border-blue-400 bg-blue-50"
+                : file
+                ? "border-green-300 bg-green-50"
+                : "border-gray-300 hover:border-gray-400 bg-gray-50"
+            }`}
+          >
+            <input {...getInputProps()} />
 
-            {file && (
-              <div className="flex items-center justify-between p-4 bg-surface-800/50 rounded-xl border border-surface-700">
-                <div className="flex items-center gap-3">
-                  <FileText className="text-brand-500" size={24} />
-                  <div className="text-left">
-                    <p className="text-sm font-bold truncate max-w-[150px]">
-                      {file.name}
-                    </p>
-                    <p className="text-xs text-surface-500">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setFile(null)}
-                  className="text-surface-500 hover:text-red-400"
+            <AnimatePresence mode="wait">
+              {file ? (
+                <motion.div
+                  key="file"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center"
                 >
-                  <X size={18} />
-                </button>
-              </div>
-            )}
-
-            <Button
-              onClick={handleUpload}
-              disabled={!file || loading}
-              isLoading={loading}
-              className="w-full h-12 text-lg"
-            >
-              Process with AI
-            </Button>
-
-            {error && (
-              <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 animate-in shake duration-300">
-                <AlertCircle size={20} className="shrink-0" />
-                <p className="text-sm font-medium">{error}</p>
-              </div>
-            )}
-          </Card>
+                  <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                    <Check className="w-7 h-7 text-green-600" />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900">{file.name}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    {(file.size / 1024).toFixed(1)} KB
+                  </p>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFile(null);
+                    }}
+                    className="mt-3 text-xs text-red-500 hover:text-red-600 font-medium flex items-center gap-1"
+                  >
+                    <X className="w-3 h-3" />
+                    Remove
+                  </button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="upload"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center"
+                >
+                  <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                    <UploadCloud className="w-7 h-7 text-blue-600" />
+                  </div>
+                  <p className="text-sm font-semibold text-gray-900">
+                    Drop file here or click to browse
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    PDF, DOC, DOCX, TXT &middot; up to 10MB
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
-        {/* Result Area */}
-        <div className="lg:col-span-7">
-          {result ? (
-            <Card className="p-8 h-full animate-in fade-in zoom-in-95 duration-500">
-              <div className="flex items-center justify-between mb-8 pb-6 border-b border-surface-800">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-emerald-500/10 text-emerald-500 rounded-full flex items-center justify-center">
-                    <CheckCircle size={28} />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold">Analysis Complete</h3>
-                    <p className="text-sm text-surface-500">
-                      Candidate ID: {result.id.slice(0, 8)}
-                    </p>
-                  </div>
-                </div>
-                <Badge variant="success">Parsed Successfully</Badge>
+        {/* Right - Form */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="grid sm:grid-cols-2 gap-4">
+              {/* Full Name */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-1.5">
+                  <User className="w-3.5 h-3.5 text-gray-400" />
+                  Full name
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  placeholder="Ada Lovelace"
+                  className={`w-full px-3.5 py-2.5 bg-gray-50 border rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                    errors.fullName ? "border-red-300 bg-red-50" : "border-gray-200"
+                  }`}
+                />
+                {errors.fullName && (
+                  <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="text-xs font-bold text-surface-500 uppercase tracking-widest mb-1">
-                      Candidate Name
-                    </h4>
-                    <p className="text-xl font-bold text-white">
-                      {result.parsed_data.name || "Unknown"}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-surface-500 uppercase tracking-widest mb-1">
-                      Experience
-                    </h4>
-                    <div className="flex items-baseline gap-2">
-                      <p className="text-3xl font-bold text-brand-500">
-                        {result.parsed_data.total_experience_years}
-                      </p>
-                      <p className="text-surface-400 text-sm">Years total</p>
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-surface-500 uppercase tracking-widest mb-1">
-                      Contact
-                    </h4>
-                    <div className="space-y-1">
-                      <p className="text-surface-300 text-sm">
-                        {result.parsed_data.email || "N/A"}
-                      </p>
-                      <p className="text-surface-300 text-sm">
-                        {result.parsed_data.phone || "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              {/* Email */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-1.5">
+                  <Mail className="w-3.5 h-3.5 text-gray-400" />
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="ada@example.com"
+                  className={`w-full px-3.5 py-2.5 bg-gray-50 border rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${
+                    errors.email ? "border-red-300 bg-red-50" : "border-gray-200"
+                  }`}
+                />
+                {errors.email && (
+                  <p className="text-xs text-red-500 mt-1">{errors.email}</p>
+                )}
+              </div>
 
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="text-xs font-bold text-surface-500 uppercase tracking-widest mb-3">
-                      Extracted Skills
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {result.parsed_data.skills.map((skill) => (
-                        <Badge
-                          key={skill}
-                          variant="brand"
-                          className="px-3 py-1 text-xs"
-                        >
-                          {skill}
-                        </Badge>
-                      ))}
-                      {result.parsed_data.skills.length === 0 && (
-                        <p className="text-surface-500 text-sm italic">
-                          No skills detected
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+              {/* Current Role */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-1.5">
+                  <Briefcase className="w-3.5 h-3.5 text-gray-400" />
+                  Current role
+                </label>
+                <input
+                  type="text"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  placeholder="Senior Frontend Engineer"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
               </div>
-            </Card>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-20 bg-surface-900/20 border-2 border-dashed border-surface-800 rounded-3xl opacity-50">
-              <div className="p-6 bg-surface-900 rounded-full mb-6">
-                <FileText className="text-surface-700" size={48} />
+
+              {/* Experience */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-1.5">
+                  <Clock className="w-3.5 h-3.5 text-gray-400" />
+                  Experience (years)
+                </label>
+                <input
+                  type="number"
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  min="0"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
               </div>
-              <h4 className="text-xl font-medium text-surface-500">
-                Awaiting Data
-              </h4>
-              <p className="text-surface-600 max-w-xs mt-2">
-                Processed resume details will appear here once the analysis is
-                complete.
-              </p>
+
+              {/* Skills */}
+              <div className="sm:col-span-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-1.5">
+                  <Tag className="w-3.5 h-3.5 text-gray-400" />
+                  Skills{" "}
+                  <span className="text-gray-400 font-normal">(comma separated)</span>
+                </label>
+                <input
+                  type="text"
+                  name="skills"
+                  value={formData.skills}
+                  onChange={handleChange}
+                  placeholder="React, TypeScript, Node, GraphQL"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
+
+              {/* Summary */}
+              <div className="sm:col-span-2">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-600 mb-1.5">
+                  <AlignLeft className="w-3.5 h-3.5 text-gray-400" />
+                  Summary
+                </label>
+                <textarea
+                  name="summary"
+                  value={formData.summary}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="One or two sentences about the candidate."
+                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                />
+              </div>
             </div>
-          )}
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-3 mt-6 pt-5 border-t border-gray-100">
+              <button
+                onClick={handleReset}
+                className="px-5 py-2.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={handleUpload}
+                disabled={uploading}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+              >
+                {uploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <span className="text-lg leading-none">+</span>
+                    Add to cohort
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Success State */}
+            <AnimatePresence>
+              {uploaded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-green-800">
+                        Candidate added successfully
+                      </p>
+                      <p className="text-xs text-green-600">
+                        {formData.fullName} has been added to your cohort.
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default UploadResume;
+}

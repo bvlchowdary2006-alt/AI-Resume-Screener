@@ -1,166 +1,287 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
-  ShieldCheck,
-  Zap,
-  BarChart,
-  Users,
   ArrowRight,
-  CheckCircle,
-  Brain,
-  Globe,
-  Lock,
+  CheckCircle2,
+  Target,
+  Zap,
+  BarChart3,
+  Shield,
+  FileText,
+  Sparkles,
 } from "lucide-react";
-import Button from "../components/ui/Button";
-import Card from "../components/ui/Card";
-import Badge from "../components/ui/Badge";
 
-const LandingPage = () => {
+const features = [
+  {
+    icon: Target,
+    title: "Rule-based Matching",
+    desc: "Transparent skill + experience scoring. No black-box AI bias.",
+  },
+  {
+    icon: Zap,
+    title: "10x Faster Screening",
+    desc: "Rank hundreds of resumes in seconds and surface top talent instantly.",
+  },
+  {
+    icon: BarChart3,
+    title: "Hiring Analytics",
+    desc: "Funnel, skills demand and monthly uploads visualized beautifully.",
+  },
+  {
+    icon: Shield,
+    title: "Bias-aware Design",
+    desc: "Your criteria, your weights. Every score is fully explainable.",
+  },
+  {
+    icon: FileText,
+    title: "Structured Intake",
+    desc: "Clean resume records with skills, experience and education parsed automatically.",
+  },
+  {
+    icon: Sparkles,
+    title: "Built for Recruiters",
+    desc: "Formal, keyboard-friendly workflows designed for hiring teams that move fast.",
+  },
+];
+
+const trustLogos = ["Northwind", "Stellaris", "Acumen", "Lattice", "Veritas", "Orbital"];
+
+const sampleCandidates = [
+  { initials: "AP", name: "Aisha Patel", role: "Senior Frontend", score: 94, color: "bg-green-500" },
+  { initials: "MC", name: "Marcus Chen", role: "Full Stack", score: 87, color: "bg-green-500" },
+  { initials: "PN", name: "Priya N.", role: "ML Engineer", score: 79, color: "bg-blue-500" },
+];
+
+export default function LandingPage() {
+  const navigate = useNavigate();
+
   return (
-    <div className="space-y-32 pb-20">
-      {/* Hero Section */}
-      <section className="text-center py-24 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-500/10 blur-[120px] rounded-full pointer-events-none" />
-        <div className="relative z-10 space-y-10 max-w-5xl mx-auto px-4">
-          <div className="flex justify-center">
-            <Badge variant="brand" className="px-6 py-2 text-sm tracking-wide">
-              v4.0: Now with BERT-based Semantic Analysis
-            </Badge>
-          </div>
-          <h1 className="text-7xl font-black tracking-tight sm:text-8xl leading-[1.1] text-white">
-            Hire smarter with <br />
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-400 to-indigo-400">
-              AI-driven screening.
-            </span>
-          </h1>
-          <p className="text-2xl text-surface-400 max-w-3xl mx-auto leading-relaxed font-medium">
-            The intelligent ATS that parses resumes, detects bias, and ranks
-            candidates using deep learning. Built for modern recruiting teams.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
-            <Link to="/upload" className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto h-16 px-12 text-xl shadow-2xl shadow-brand-500/20"
+    <div>
+      {/* Hero */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 to-gray-50 dark:from-gray-900 dark:to-gray-900" />
+        <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0)", backgroundSize: "32px 32px" }} />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left */}
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-full text-sm text-blue-700 mb-6 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-300"
               >
-                Start Screening <ArrowRight className="ml-3" size={24} />
-              </Button>
-            </Link>
-            <Link to="/dashboard" className="w-full sm:w-auto">
-              <Button
-                variant="secondary"
-                size="lg"
-                className="w-full sm:w-auto h-16 px-12 text-xl"
+                <span className="w-1.5 h-1.5 bg-blue-600 rounded-full dark:bg-blue-400" />
+                New &middot; Transparent scoring engine v2
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight dark:text-white"
               >
-                View Dashboard
-              </Button>
-            </Link>
-          </div>
-          <div className="pt-12 flex items-center justify-center gap-8 text-surface-500 text-sm font-bold uppercase tracking-widest">
-            <span>Trusted by</span>
-            <div className="h-px w-12 bg-surface-800" />
-            <span className="text-surface-300">Leading Tech Teams</span>
+                Resume Screener made{" "}
+                <span className="text-blue-600">smarter</span>, not mysterious.
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mt-6 text-lg text-gray-500 leading-relaxed max-w-xl dark:text-gray-400"
+              >
+                Score, rank and shortlist candidates with a fully transparent rule-based engine. Designed for hiring teams that move fast and hire fairly.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="mt-8 flex flex-wrap gap-3"
+              >
+                <button
+                  onClick={() => navigate("/dashboard")}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Open Dashboard
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => navigate("/jobs")}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+                >
+                  Run a Job Match
+                </button>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mt-8 flex flex-wrap gap-5 text-sm text-gray-500"
+              >
+                {["No AI vendor lock-in", "Fully explainable", "GDPR-ready"].map((item) => (
+                  <span key={item} className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    {item}
+                  </span>
+                ))}
+              </motion.div>
+            </div>
+
+            {/* Right - Live Screening Preview */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="relative"
+            >
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-xl shadow-gray-200/50 overflow-hidden">
+                {/* Card Header */}
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Live Screening</p>
+                    <p className="text-xs text-gray-400">COHORT &middot; TODAY</p>
+                  </div>
+                  <div className="ml-auto flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-green-500 rounded-full" />
+                    <span className="text-xs text-gray-500">Active</span>
+                  </div>
+                </div>
+
+                {/* Candidates */}
+                <div className="p-6 space-y-4">
+                  {sampleCandidates.map((c) => (
+                    <div key={c.initials} className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600">
+                        {c.initials}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{c.name}</p>
+                        <p className="text-xs text-gray-400">{c.role}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${c.color}`} style={{ width: `${c.score}%` }} />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900 w-8 text-right">{c.score}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Floating Stats Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="absolute -bottom-6 -left-6 bg-white rounded-xl border border-gray-200 shadow-lg px-5 py-4"
+              >
+                <p className="text-xs text-gray-400 uppercase tracking-wider font-medium">Avg Match</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">
+                  81<span className="text-sm text-gray-400 font-normal"> / 100</span>
+                </p>
+                <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                  </svg>
+                  12.4% vs last week
+                </p>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Core Features */}
-      <section className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-10">
-        <Card
-          hover
-          className="p-10 space-y-6 bg-surface-900/40 border-surface-800/50"
-        >
-          <div className="w-16 h-16 bg-brand-500/10 rounded-2xl flex items-center justify-center text-brand-500">
-            <Brain size={32} />
-          </div>
-          <h3 className="text-2xl font-bold text-white">Deep Parsing</h3>
-          <p className="text-surface-400 text-lg leading-relaxed">
-            Automatically extract skills, experience, and education from any PDF
-            or DOCX with 99.2% accuracy.
+      {/* Trust Logos */}
+      <section className="border-y border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <p className="text-center text-xs font-semibold text-gray-400 uppercase tracking-widest mb-8">
+            Trusted by fast-moving hiring teams
           </p>
-        </Card>
-        <Card
-          hover
-          className="p-10 space-y-6 bg-surface-900/40 border-surface-800/50"
-        >
-          <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500">
-            <ShieldCheck size={32} />
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+            {trustLogos.map((logo) => (
+              <span key={logo} className="text-lg font-semibold text-gray-300 hover:text-gray-400 transition-colors cursor-default">
+                {logo}
+              </span>
+            ))}
           </div>
-          <h3 className="text-2xl font-bold text-white">Bias Audit</h3>
-          <p className="text-surface-400 text-lg leading-relaxed">
-            Ensure fairness with automated detection of gendered language and
-            institutional bias signals.
-          </p>
-        </Card>
-        <Card
-          hover
-          className="p-10 space-y-6 bg-surface-900/40 border-surface-800/50"
-        >
-          <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500">
-            <BarChart size={32} />
-          </div>
-          <h3 className="text-2xl font-bold text-white">Semantic Match</h3>
-          <p className="text-surface-400 text-lg leading-relaxed">
-            Go beyond keywords. Rank candidates based on true semantic relevance
-            to your job description.
-          </p>
-        </Card>
+        </div>
       </section>
 
-      {/* Trust Section */}
-      <section className="bg-surface-900/20 border-y border-surface-900 py-24 px-4">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-8 text-left">
-            <h2 className="text-5xl font-black text-white leading-tight">
-              Built for production <br /> at every scale.
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {[
-                {
-                  icon: Globe,
-                  title: "Global Scale",
-                  desc: "Process thousands of resumes daily.",
-                },
-                {
-                  icon: Lock,
-                  title: "Enterprise Security",
-                  desc: "Your data is encrypted and secure.",
-                },
-                {
-                  icon: Zap,
-                  title: "Instant API",
-                  desc: "Seamlessly integrate with your workflow.",
-                },
-                {
-                  icon: Users,
-                  title: "Team Collab",
-                  desc: "Shared dashboards for hiring managers.",
-                },
-              ].map((item, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className="shrink-0 w-10 h-10 bg-brand-500/10 rounded-lg flex items-center justify-center text-brand-500">
-                    <item.icon size={20} />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white">{item.title}</h4>
-                    <p className="text-sm text-surface-500">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-4 bg-brand-500/20 blur-3xl rounded-full opacity-30 animate-pulse" />
-            <Card className="p-2 border-surface-700 bg-surface-950 shadow-2xl relative overflow-hidden">
-              <div className="aspect-video bg-surface-900 rounded-xl flex items-center justify-center text-surface-700 font-bold italic">
-                Dashboard Preview
+      {/* Features */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+        <div className="max-w-2xl">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+            Why Resume Screener
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">
+            Everything you need to hire with{" "}
+            <span className="text-blue-600">clarity</span>.
+          </h2>
+          <p className="mt-4 text-gray-500 leading-relaxed">
+            Purpose-built primitives for modern recruiters. Every feature is designed to make screening faster, fairer and more explainable.
+          </p>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-14">
+          {features.map((f, i) => (
+            <motion.div
+              key={f.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              className="group bg-white rounded-xl border border-gray-200 p-6 hover:border-gray-300 hover:shadow-sm transition-all"
+            >
+              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
+                <f.icon className="w-5 h-5 text-blue-600" />
               </div>
-            </Card>
+              <h3 className="text-base font-semibold text-gray-900">{f.title}</h3>
+              <p className="mt-2 text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
+        <div className="bg-blue-50/50 border border-blue-100 rounded-2xl px-8 py-14 text-center">
+          <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-6">
+            <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Ready to screen smarter?
+          </h2>
+          <p className="mt-3 text-gray-500">
+            Seed your first cohort in under a minute. Zero setup required.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <button
+              onClick={() => navigate("/upload")}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Upload First Resume
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => navigate("/analytics")}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-700 font-medium rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+            >
+              See analytics
+            </button>
           </div>
         </div>
       </section>
     </div>
   );
-};
-
-export default LandingPage;
+}

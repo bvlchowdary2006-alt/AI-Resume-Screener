@@ -1,99 +1,104 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks
-from typing import List, Optional
+import os
+import csv
+import random
+from fastapi import APIRouter, UploadFile, File, HTTPException
 from app.models.schemas import ResumeResponse, ParsedData
 from app.services.parser import ResumeParser
-from app.pipelines.nlp_pipeline import nlp_pipeline
-from app.utils.supabase_client import supabase_client
-from loguru import logger
-import uuid
-import datetime
+from app.pipelines.nlp_pipeline import NLPPipeline
+from app.utils.config import settings
 
 router = APIRouter()
 
-MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-ALLOWED_EXTENSIONS = {".pdf", ".docx"}
+# In-memory store for uploaded resumes
+uploaded_resumes = []
+candidate_id_counter = 0
 
-@router.post("/upload_resume")
+def load_candidates_from_csv():
+    """Load candidates from the datasets CSV file."""
+    csv_path = os.path.join(settings.DATASETS_DIR, "candidates.csv")
+    candidates = []
+    if os.path.exists(csv_path):
+        with open(csv_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                candidates.append({
+                    "id": int(row["id"]),
+                    "name": row["name"],
+                    "email": row["email"],
+                    "skills": [s.strip() for s in row["skills"].split(",")],
+                    "experience": int(row["experience"]),
+                    "education": row["education"],
+                    "role": row.get("role", ""),
+                    "resume_text": row.get("resume_text", ""),
+                })
+    return candidates
+
+@router.post("/resumes/upload", response_model=dict)
 async def upload_resume(file: UploadFile = File(...)):
-    # 1. Validate file extension
-    import os
-    ext = os.path.splitext(file.filename)[1].lower()
-    if ext not in ALLOWED_EXTENSIONS:
-        logger.warning(f"Unsupported file format: {file.filename}")
-        raise HTTPException(status_code=400, detail=f"Unsupported file format. Allowed: {ALLOWED_EXTENSIONS}")
+    """Upload and parse a resume file."""
+    global candidate_id_counter
 
-    # 2. Read file and validate size
-    content = await file.read()
-    if len(content) > MAX_FILE_SIZE:
-        logger.warning(f"File too large: {file.filename} ({len(content)} bytes)")
-        raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB.")
+    # Validate file type
+    allowed_types = [
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/msword",
+        "text/plain",
+    ]
+    if file.content_type not in allowed_types and not file.filename.endswith((".pdf", ".docx", ".doc", ".txt")):
+        raise HTTPException(status_code=400, detail="Invalid file type. Use PDF, DOCX, or TXT.")
 
-    if not supabase_client:
-        logger.error("Supabase client is not initialized.")
-        raise HTTPException(status_code=500, detail="Database connection error.")
+    # Validate file size (10MB)
+    contents = await file.read()
+    if len(contents) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Max 10MB.")
 
-    try:
-        # 3. Parse text
-        logger.info(f"Parsing resume: {file.filename}")
-        text = ResumeParser.parse(content, file.filename)
-        if not text or not text.strip():
-            logger.warning(f"Could not extract text from: {file.filename}")
-            raise HTTPException(status_code=400, detail="Could not extract text from the file.")
-            
-        # 4. Extract entities
-        logger.info(f"Extracting entities from: {file.filename}")
-        parsed_data_dict = nlp_pipeline.extract_entities(text)
-        parsed_data = ParsedData(**parsed_data_dict)
-        
-        # 5. Store in Supabase
-        resume_id = str(uuid.uuid4())
-        candidate_data = {
-            "id": resume_id,
-            "name": parsed_data.name or "Unknown Candidate",
-            "email": parsed_data.email,
-            "phone": parsed_data.phone,
-            "parsed_data": parsed_data.dict(),
-            "resume_text": text,
-            "created_at": datetime.datetime.now().isoformat()
-        }
-        
-        logger.info(f"Saving candidate to Supabase: {resume_id}")
-        supabase_client.table("candidates").insert(candidate_data).execute()
-        
-        return {
-            "id": resume_id,
-            "filename": file.filename,
-            "parsed_data": parsed_data,
-            "message": "Resume uploaded and parsed successfully"
-        }
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        logger.error(f"Error during resume upload/parse: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Processing error: {str(e)}")
+    # Parse resume text
+    file_ext = file.filename.split(".")[-1].lower()
+    if file_ext == "pdf":
+        text = ResumeParser.extract_text_from_pdf(contents)
+    elif file_ext in ["docx", "doc"]:
+        text = ResumeParser.extract_text_from_docx(contents)
+    else:
+        text = contents.decode("utf-8", errors="ignore")
 
-@router.get("/resumes")
+    # Extract entities using NLP pipeline
+    nlp = NLPPipeline()
+    parsed = nlp.extract_entities(text)
+
+    candidate_id_counter += 1
+    candidate = {
+        "id": candidate_id_counter,
+        "name": parsed.get("name", file.filename),
+        "email": parsed.get("email", ""),
+        "skills": parsed.get("skills", []),
+        "experience": parsed.get("experience_years", 0),
+        "education": parsed.get("education", ""),
+        "role": "",
+        "resume_text": text[:500],
+    }
+    uploaded_resumes.append(candidate)
+
+    return {
+        "message": "Resume uploaded successfully",
+        "candidate": candidate,
+    }
+
+@router.get("/resumes", response_model=list)
 async def get_resumes():
-    if not supabase_client:
-        raise HTTPException(status_code=500, detail="Database connection error.")
-    try:
-        response = supabase_client.table("candidates").select("*").execute()
-        return response.data
-    except Exception as e:
-        logger.error(f"Error fetching resumes: {str(e)}")
-        raise HTTPException(status_code=500, detail="Could not fetch resumes.")
+    """Get all candidates (from CSV + uploads)."""
+    csv_candidates = load_candidates_from_csv()
+    # Limit to first 50 from CSV for performance
+    return csv_candidates[:50] + uploaded_resumes
 
-@router.get("/resumes/{resume_id}")
-async def get_resume(resume_id: str):
-    if not supabase_client:
-        raise HTTPException(status_code=500, detail="Database connection error.")
-    try:
-        response = supabase_client.table("candidates").select("*").eq("id", resume_id).single().execute()
-        if not response.data:
-            raise HTTPException(status_code=404, detail="Resume not found")
-        return response.data
-    except HTTPException as he:
-        raise he
-    except Exception as e:
-        logger.error(f"Error fetching resume {resume_id}: {str(e)}")
-        raise HTTPException(status_code=404, detail="Resume not found")
+@router.get("/resumes/{resume_id}", response_model=dict)
+async def get_resume(resume_id: int):
+    """Get a specific candidate."""
+    csv_candidates = load_candidates_from_csv()
+    all_candidates = csv_candidates + uploaded_resumes
+
+    for c in all_candidates:
+        if c["id"] == resume_id:
+            return c
+
+    raise HTTPException(status_code=404, detail="Candidate not found")

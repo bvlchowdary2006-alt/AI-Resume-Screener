@@ -1,32 +1,79 @@
-import React from "react";
 import Navbar from "./Navbar";
 
-const Layout = ({ children }) => {
+export default function Layout({ children }) {
   return (
-    <div className="min-h-screen bg-surface-950 text-surface-50 font-sans selection:bg-brand-500/30">
-      {/* Background blobs for premium feel */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-brand-900/20 blur-[120px]" />
-        <div className="absolute top-[40%] -right-[10%] w-[30%] h-[30%] rounded-full bg-indigo-900/20 blur-[120px]" />
-        <div className="absolute -bottom-[10%] left-[20%] w-[50%] h-[50%] rounded-full bg-brand-950/10 blur-[120px]" />
-      </div>
-
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
+      <main className="pb-20">{children}</main>
 
-      <main className="relative pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {children}
-      </main>
-
-      <footer className="relative mt-auto py-8 border-t border-surface-900 bg-surface-950/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-surface-500 text-sm">
-            © 2026 AI Resume Screening System. Built for high-performance
-            recruitment.
-          </p>
+      {/* Footer */}
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2.5 mb-4">
+                <img src="/logo/logo.jpg" alt="Resume Screener logo" className="h-10 w-10 rounded-xl object-cover" />
+                <span className="text-lg font-bold text-gray-900 tracking-wider">
+                  RESUME SCREENER
+                </span>
+              </div>
+              <p className="text-sm text-gray-500 max-w-sm leading-relaxed">
+                Comprehensive resume screening for modern teams. Score, rank and shortlist top candidates with transparent, rule-based matching.
+              </p>
+              <div className="flex gap-2 mt-5">
+                {["GitHub", "Twitter", "LinkedIn"].map((social) => (
+                  <button
+                    key={social}
+                    className="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors"
+                  >
+                    <span className="text-xs">{social[0]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                Product
+              </h4>
+              <ul className="space-y-3">
+                {["Dashboard", "Upload Resume", "Job Match", "Analytics"].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                Company
+              </h4>
+              <ul className="space-y-3">
+                {["About", "Careers", "Press", "Contact"].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-sm text-gray-500 hover:text-gray-900 transition-colors">
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="mt-10 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-gray-400">
+              &copy; 2026 Resume Screener &mdash; Built for recruiters who move fast.
+            </p>
+            <div className="flex gap-4">
+              {["Privacy", "Terms", "Security"].map((link) => (
+                <a key={link} href="#" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                  {link}
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </footer>
     </div>
   );
-};
-
-export default Layout;
+}

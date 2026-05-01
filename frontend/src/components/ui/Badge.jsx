@@ -1,24 +1,14 @@
-import React from 'react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-const Badge = ({ children, className, variant = 'brand' }) => {
+const Badge = ({ variant = "default", className = "", children }) => {
   const variants = {
-    brand: "bg-brand-500/10 text-brand-400 border-brand-500/20",
-    success: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    warning: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    danger: "bg-red-500/10 text-red-400 border-red-500/20",
-    surface: "bg-surface-800 text-surface-300 border-surface-700",
+    default: "bg-gray-100 text-gray-700",
+    brand: "bg-blue-50 text-blue-700 border border-blue-200",
+    success: "bg-green-50 text-green-700 border border-green-200",
+    warning: "bg-orange-50 text-orange-700 border border-orange-200",
+    danger: "bg-red-50 text-red-700 border border-red-200",
   };
 
   return (
-    <span className={twMerge(
-      clsx(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
-        variants[variant],
-        className
-      )
-    )}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-lg ${variants[variant]} ${className}`}>
       {children}
     </span>
   );

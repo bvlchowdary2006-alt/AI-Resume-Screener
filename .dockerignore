@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.local
+**/.vscode
+**/.idea
+**/*.log
+backend/venv
+backend/__pycache__
+frontend/node_modules
+frontend/dist
+notebooks/.ipynb_checkpoints
+*.pyc
+.git

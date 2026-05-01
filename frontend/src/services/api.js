@@ -1,42 +1,49 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api/v1";
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_URL,
+  headers: { "Content-Type": "application/json" },
 });
 
 export const resumeService = {
   upload: async (file) => {
     const formData = new FormData();
-    formData.append('file', file);
-    const response = await api.post('/upload_resume', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    formData.append("file", file);
+    const { data } = await api.post("/resumes/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
-    return response.data;
+    return data;
   },
   getAll: async () => {
-    const response = await api.get('/resumes');
-    return response.data;
+    const { data } = await api.get("/resumes");
+    return data;
   },
 };
 
 export const jobService = {
   match: async (jobData) => {
-    const response = await api.post('/match_job', jobData);
-    return response.data;
+    const { data } = await api.post("/jobs/match", jobData);
+    return data;
+  },
+  getAll: async () => {
+    const { data } = await api.get("/jobs");
+    return data;
   },
 };
 
 export const analyticsService = {
   getSummary: async () => {
-    const response = await api.get('/analytics');
-    return response.data;
+    const { data } = await api.get("/analytics/summary");
+    return data;
   },
   getBiasReport: async (resumeId) => {
-    const response = await api.get(`/bias_report/${resumeId}`);
-    return response.data;
+    const { data } = await api.get(`/analytics/bias/${resumeId}`);
+    return data;
+  },
+  getHealth: async () => {
+    const { data } = await api.get("/health");
+    return data;
   },
 };
-
-export default api;

@@ -1,54 +1,70 @@
-from pydantic import BaseModel, EmailStr
-from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 class ResumeBase(BaseModel):
-    filename: str
-    content_type: str
+    name: str
+    email: str
+    phone: Optional[str] = None
+    skills: Optional[List[str]] = []
+    experience: Optional[int] = 0
+    education: Optional[str] = None
+    role: Optional[str] = None
 
 class ParsedData(BaseModel):
     name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
     skills: List[str] = []
-    education: List[Dict[str, Any]] = []
-    experience: List[Dict[str, Any]] = []
-    total_experience_years: float = 0.0
+    experience: Optional[int] = 0
+    education: Optional[str] = None
+    experience_text: Optional[str] = None
+    summary: Optional[str] = None
 
 class ResumeResponse(BaseModel):
-    id: str
-    filename: str
-    parsed_data: ParsedData
-    created_at: datetime
+    id: int
+    name: str
+    email: str
+    skills: List[str]
+    experience: int
+    education: Optional[str]
+    role: Optional[str]
+    score: Optional[float] = None
+    created_at: Optional[str] = None
 
 class JobDescription(BaseModel):
     title: str
     description: str
     required_skills: List[str]
-    min_experience_years: float
+    min_experience: int = 0
 
 class ScoringResult(BaseModel):
-    candidate_id: str
+    candidate_id: int
     candidate_name: str
     overall_score: float
-    skill_match_score: float
+    skill_score: float
     experience_score: float
-    semantic_similarity_score: float
-    explanation: str
+    semantic_score: float
 
 class RankingResponse(BaseModel):
-    job_id: str
+    job_title: str
+    total_candidates: int
     rankings: List[ScoringResult]
 
 class BiasReport(BaseModel):
-    gender_bias_detected: bool
-    university_bias_detected: bool
-    name_bias_detected: bool
+    resume_id: int
+    gender_bias: bool
+    gender_confidence: float
+    university_bias: bool
+    university_name: Optional[str] = None
     fairness_score: float
-    recommendations: List[str]
+    flagged_terms: List[str] = []
 
-class AnalyticsResponse(BaseModel):
+class AnalyticsSummary(BaseModel):
     total_resumes: int
     avg_score: float
+    fairness_index: float
+    active_jobs: int
+    model_confidence: float
     skill_distribution: Dict[str, int]
     bias_insights: Dict[str, Any]
