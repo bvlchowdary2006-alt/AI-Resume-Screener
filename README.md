@@ -1,6 +1,5 @@
-# AI.Screen — Hiring Intelligence
+# AI RESUME SCANNER
 
-<<<<<<< HEAD
 AI-powered resume screening, candidate ranking, and bias detection for modern hiring teams.
 
 ## Features
@@ -10,47 +9,7 @@ AI-powered resume screening, candidate ranking, and bias detection for modern hi
 - **Bias Detection** — Identify gendered language and elite-university preferences in job descriptions
 - **Hiring Analytics** — Track your pipeline with skill distribution charts, quality trends, and hiring funnel visualizations
 
-## Quick Start
 
-### Without Docker
-
-#### 1. Backend
-
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate    # Windows
-# source venv/bin/activate  # Mac/Linux
-pip install -r requirements.txt
-python -m spacy download en_core_web_sm
-uvicorn app.main:app --reload
-```
-
-Backend runs at `http://localhost:8000`
-Swagger docs at `http://localhost:8000/docs`
-
-#### 2. Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend runs at `http://localhost:3000`
-
-#### 3. Jupyter Notebooks
-
-```bash
-pip install notebook jupyter
-jupyter notebook
-```
-
-Open `notebooks/` and run cells in order (01 through 06).
-
-### With Docker
-=======
-A production-ready, full-stack Applicant Tracking System (ATS) designed to automate hiring workflows using Artificial Intelligence, Natural Language Processing, and Machine Learning. This platform intelligently parses resumes, compares them with job descriptions, ranks candidates, and provides hiring insights through a modern SaaS dashboard.
 
 ---
 
@@ -91,17 +50,13 @@ A production-ready, full-stack Applicant Tracking System (ATS) designed to autom
 
 ---
 
-###  Sample Frontend Link made by EmergentAI:
-https://resume-screener-pro.preview.emergentagent.com/
-
----
 
 #  Project Overview
 
 The AI-Powered Intelligent Resume Screening System helps recruiters and organizations streamline their hiring process by automatically screening, evaluating, and ranking resumes against job descriptions.
 
 Instead of manually reviewing hundreds of applications, recruiters can upload resumes and instantly receive:
->>>>>>> 35ea6071996d475894708e96568b7fcaa9b249f5
+
 
 - Structured candidate profiles  
 - AI-based compatibility scores  
@@ -110,7 +65,7 @@ Instead of manually reviewing hundreds of applications, recruiters can upload re
 - Bias detection reports  
 - Hiring analytics dashboard  
 
-<<<<<<< HEAD
+
 - Frontend: `http://localhost:3000`
 - Backend Swagger: `http://localhost:8000/docs`
 
@@ -199,8 +154,7 @@ The notebooks walk through the full ML pipeline:
 | GET | `/api/v1/analytics/summary` | Get analytics summary |
 | GET | `/api/v1/analytics/bias/{id}` | Get bias report for a candidate |
 
-## License
-=======
+
 ---
 
 #  Core Features
@@ -219,7 +173,7 @@ Automatically extracts important candidate information from uploaded PDF and DOC
 - Projects  
 
 ---
->>>>>>> 35ea6071996d475894708e96568b7fcaa9b249f5
+
 
 ##  Smart Candidate Matching
 
@@ -299,33 +253,6 @@ Modern enterprise-grade interface featuring:
 
 ---
 
-#  AI Workflow
-
-## Step 1: Upload Resume
-
-Recruiters upload candidate resumes.
-
-## Step 2: Parse Resume
-
-System extracts structured data using NLP.
-
-## Step 3: Add Job Description
-
-Paste or upload job description.
-
-## Step 4: Semantic Matching
-
-BERT compares candidate profile with JD.
-
-## Step 5: Candidate Ranking
-
-Applicants receive ATS score and ranking.
-
-## Step 6: Review Insights
-
-Recruiters view analytics and fairness reports.
-
----
 
 #  Project Architecture
 
