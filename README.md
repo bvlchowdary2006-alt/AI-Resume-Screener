@@ -1,4 +1,4 @@
-# AI RESUME SCANNER
+# AI RESUME SCREENER
 
 AI-powered resume screening, candidate ranking, and bias detection for modern hiring teams.
 
